@@ -51,6 +51,13 @@ class BackendConfig:
         self.discord_client_id: str | None = os.getenv("DISCORD_CLIENT_ID")
         self.discord_client_secret: str | None = os.getenv("DISCORD_CLIENT_SECRET")
         self.discord_oauth_scope: str = os.getenv("DISCORD_OAUTH_SCOPE", "identify guilds")
+        # Comma-separated full callback URLs (prefix match). Must include every
+        # redirect_uri the dashboard may send to /auth/discord (e.g. API or frontend).
+        self.discord_oauth_allowed_redirect_uris: list[str] = [
+            u.strip()
+            for u in os.getenv("DISCORD_OAUTH_ALLOWED_REDIRECT_URIS", "").split(",")
+            if u.strip()
+        ]
         self.auth_jwt_secret: str = os.getenv(
             "AUTH_JWT_SECRET", "change-this-in-production"
         )

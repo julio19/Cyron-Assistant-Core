@@ -29,14 +29,18 @@ logger = structlog.get_logger(__name__)
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 
-ALLOWED_REDIRECT_URIS: list[str] = [
+_BUILTIN_ALLOWED_REDIRECT_URIS: tuple[str, ...] = (
     "https://cyron-assistant.vercel.app/auth/callback",
     "http://localhost:5173/auth/callback",
-]
+)
+
+
+def _allowed_redirect_uri_prefixes() -> list[str]:
+    return list(_BUILTIN_ALLOWED_REDIRECT_URIS) + config.discord_oauth_allowed_redirect_uris
 
 
 def _is_allowed_redirect_uri(redirect_uri: str) -> bool:
-    return any(redirect_uri.startswith(uri) for uri in ALLOWED_REDIRECT_URIS)
+    return any(redirect_uri.startswith(uri) for uri in _allowed_redirect_uri_prefixes())
 
 
 def _append_query_param(url: str, key: str, value: str) -> str:
