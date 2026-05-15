@@ -30,6 +30,8 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 
 
 _BUILTIN_ALLOWED_REDIRECT_URIS: tuple[str, ...] = (
+    "https://cyron-assistant-frontend.vercel.app/auth/callback",
+    "https://api.cyronticket.com/auth/callback",
     "https://cyron-assistant.vercel.app/auth/callback",
     "http://localhost:5173/auth/callback",
 )
@@ -235,7 +237,7 @@ async def discord_oauth_callback_json(
     return JSONResponse(
         {
             "token": app_token,
-            "redirect": "https://cyron-assistant.vercel.app/",
+            "redirect": config.frontend_public_url,
         }
     )
 

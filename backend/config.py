@@ -65,8 +65,9 @@ class BackendConfig:
         self.auth_jwt_exp_minutes: int = int(
             os.getenv("AUTH_JWT_EXP_MINUTES", "1440")
         )
+        # Strip trailing slashes so browser Origins (no slash) match allowlist entries.
         self.frontend_allowed_origins: list[str] = [
-            origin.strip()
+            origin.strip().rstrip("/")
             for origin in os.getenv(
                 "FRONTEND_ALLOWED_ORIGINS", "http://localhost:5173"
             ).split(",")
@@ -75,6 +76,14 @@ class BackendConfig:
         self.backend_public_url: str = os.getenv(
             "BACKEND_PUBLIC_URL", f"http://{self.host}:{self.port}"
         ).rstrip("/")
+        # Dashboard URL after OAuth (JSON callback). Falls back to first CORS origin.
+        _frontend_public = os.getenv("FRONTEND_PUBLIC_URL", "").strip().rstrip("/")
+        if _frontend_public:
+            self.frontend_public_url: str = _frontend_public
+        elif self.frontend_allowed_origins:
+            self.frontend_public_url = self.frontend_allowed_origins[0]
+        else:
+            self.frontend_public_url = "http://localhost:5173"
 
 
 # Global config instance
